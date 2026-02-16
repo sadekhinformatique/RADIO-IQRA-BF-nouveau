@@ -1,0 +1,7 @@
+{
+  "name": "Radio Iqra",
+  "description": "Une application de radio islamique élégante et moderne proposant du contenu en direct, des programmes hebdomadaires et une expérience d'écoute spirituelle.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
