@@ -1,0 +1,11 @@
+
+services:
+  - type: web
+    name: radio-iqra
+    runtime: static
+    buildCommand: npm run build
+    publishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
