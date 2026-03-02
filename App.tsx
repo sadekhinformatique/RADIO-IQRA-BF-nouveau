@@ -5,6 +5,7 @@ import { STREAM_URL } from './constants';
 import SplashScreen from './components/SplashScreen';
 import PlayerScreen from './components/PlayerScreen';
 import ScheduleScreen from './components/ScheduleScreen';
+import FavoritesScreen from './components/FavoritesScreen';
 import SettingsScreen from './components/SettingsScreen';
 import Navigation from './components/Navigation';
 
@@ -56,6 +57,8 @@ const App: React.FC = () => {
         return <PlayerScreen isPlaying={isPlaying} setIsPlaying={setIsPlaying} />;
       case Screen.SCHEDULE:
         return <ScheduleScreen />;
+      case Screen.FAVORITES:
+        return <FavoritesScreen />;
       case Screen.SETTINGS:
         return <SettingsScreen isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
       default:

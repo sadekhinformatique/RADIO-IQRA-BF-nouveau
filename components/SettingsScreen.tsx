@@ -1,14 +1,28 @@
 
 import React from 'react';
-import { ChevronRight, Music, Bell, Moon, Sun, Info, Shield, Star, LogOut } from 'lucide-react';
+import { ChevronRight, Music, Bell, Moon, Sun, Info, Shield, Star, LogOut, LucideIcon } from 'lucide-react';
 
 interface SettingsScreenProps {
   isDarkMode: boolean;
   setIsDarkMode: (dark: boolean) => void;
 }
 
+interface SettingsItem {
+  icon: LucideIcon;
+  label: string;
+  value?: string;
+  type?: 'toggle' | 'theme-toggle';
+  active?: boolean;
+  color: string;
+}
+
+interface SettingsSection {
+  title: string;
+  items: SettingsItem[];
+}
+
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ isDarkMode, setIsDarkMode }) => {
-  const sections = [
+  const sections: SettingsSection[] = [
     {
       title: 'Paramètres Audio',
       items: [
@@ -60,7 +74,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ isDarkMode, setIsDarkMo
                       i !== section.items.length - 1 ? 'border-b border-slate-100 dark:border-white/5' : ''
                     }`}
                     onClick={() => {
-                      if (item.type === 'theme-toggle') setIsDarkMode(!isDarkMode);
+                      if (item.type === 'theme-toggle') {
+                        setIsDarkMode(!isDarkMode);
+                      } else if (item.label === 'À propos de nous') {
+                        alert("Radio Iqra - La Voix du Saint Coran\nVersion 1.0.4\nContact: contact@radioiqra.bf");
+                      } else if (item.label === 'Noter l\'application') {
+                        alert("Merci de votre intérêt ! Cette fonctionnalité sera bientôt disponible.");
+                      } else if (item.label === 'Politique de confidentialité') {
+                        alert("Vos données sont protégées. Nous ne collectons aucune information personnelle.");
+                      }
                     }}
                   >
                     <div className="flex items-center gap-4">
@@ -96,7 +118,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ isDarkMode, setIsDarkMo
           </div>
         ))}
 
-        <button className="w-full flex items-center justify-center gap-3 p-5 rounded-3xl bg-red-500/10 text-red-500 font-bold hover:bg-red-500/20 transition-all">
+        <button 
+          onClick={() => alert("Déconnexion réussie")}
+          className="w-full flex items-center justify-center gap-3 p-5 rounded-3xl bg-red-500/10 text-red-500 font-bold hover:bg-red-500/20 transition-all"
+        >
           <LogOut size={20} />
           Se déconnecter
         </button>

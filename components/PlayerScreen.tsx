@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { LOGO_URL } from '../constants';
 import { ChevronDown, MoreHorizontal, Timer, SkipBack, SkipForward, Share2, VolumeX, Volume2, Play, Pause } from 'lucide-react';
 
@@ -9,6 +9,8 @@ interface PlayerScreenProps {
 }
 
 const PlayerScreen: React.FC<PlayerScreenProps> = ({ isPlaying, setIsPlaying }) => {
+  const [volume, setVolume] = useState(66);
+
   return (
     <div className="h-full flex flex-col p-6 pb-32 animate-in slide-in-from-bottom duration-500">
       <header className="flex justify-between items-center mb-8">
@@ -64,10 +66,16 @@ const PlayerScreen: React.FC<PlayerScreenProps> = ({ isPlaying, setIsPlaying }) 
         </div>
 
         <div className="flex items-center justify-between px-2">
-          <button className="text-slate-400 hover:text-primary transition-colors">
+          <button 
+            onClick={() => alert("Minuteur de mise en veille activé (30 min)")}
+            className="text-slate-400 hover:text-primary transition-colors"
+          >
             <Timer size={28} />
           </button>
-          <button className="text-slate-800 dark:text-white hover:text-primary transition-colors">
+          <button 
+            onClick={() => alert("Retour au programme précédent")}
+            className="text-slate-800 dark:text-white hover:text-primary transition-colors"
+          >
             <SkipBack size={36} fill="currentColor" />
           </button>
           <button 
@@ -76,21 +84,37 @@ const PlayerScreen: React.FC<PlayerScreenProps> = ({ isPlaying, setIsPlaying }) 
           >
             {isPlaying ? <Pause size={48} fill="currentColor" /> : <Play size={48} fill="currentColor" className="translate-x-1" />}
           </button>
-          <button className="text-slate-800 dark:text-white hover:text-primary transition-colors">
+          <button 
+            onClick={() => alert("Passer au programme suivant")}
+            className="text-slate-800 dark:text-white hover:text-primary transition-colors"
+          >
             <SkipForward size={36} fill="currentColor" />
           </button>
-          <button className="text-slate-400 hover:text-primary transition-colors">
+          <button 
+            onClick={() => alert("Lien de partage copié dans le presse-papier !")}
+            className="text-slate-400 hover:text-primary transition-colors"
+          >
             <Share2 size={28} />
           </button>
         </div>
 
         <div className="flex items-center gap-4 px-4">
-          <VolumeX className="text-slate-400" size={18} />
-          <div className="flex-grow h-1.5 bg-slate-200 dark:bg-white/10 rounded-full relative">
-            <div className="absolute left-0 top-0 bottom-0 w-2/3 bg-primary rounded-full"></div>
-            <div className="absolute left-[66%] top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md cursor-pointer"></div>
+          <button onClick={() => setVolume(0)}>
+            <VolumeX className="text-slate-400" size={18} />
+          </button>
+          <div className="flex-grow h-1.5 bg-slate-200 dark:bg-white/10 rounded-full relative cursor-pointer" 
+               onClick={(e) => {
+                 const rect = e.currentTarget.getBoundingClientRect();
+                 const x = e.clientX - rect.left;
+                 const newVolume = Math.round((x / rect.width) * 100);
+                 setVolume(Math.max(0, Math.min(100, newVolume)));
+               }}>
+            <div className="absolute left-0 top-0 bottom-0 bg-primary rounded-full transition-all duration-150" style={{ width: `${volume}%` }}></div>
+            <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md transition-all duration-150" style={{ left: `calc(${volume}% - 8px)` }}></div>
           </div>
-          <Volume2 className="text-slate-400" size={18} />
+          <button onClick={() => setVolume(100)}>
+            <Volume2 className="text-slate-400" size={18} />
+          </button>
         </div>
       </div>
 

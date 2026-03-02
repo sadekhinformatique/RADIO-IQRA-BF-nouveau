@@ -37,7 +37,7 @@ const ScheduleScreen: React.FC = () => {
       <main className="flex-grow px-6 pb-32 space-y-8">
         <div className="flex items-center justify-between">
           <h2 className="text-xs uppercase tracking-[0.2em] font-bold text-primary/70">
-            {selectedDay === 'Lundi' ? "Aujourd'hui • Lundi" : selectedDay}
+            {selectedDay}
           </h2>
           {selectedDay === 'Lundi' && (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 animate-pulse">
@@ -86,7 +86,10 @@ const ScheduleScreen: React.FC = () => {
                   </div>
 
                   {!program.isLive && !program.isPast && (
-                    <button className="mt-4 px-4 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-[11px] font-bold flex items-center gap-2 hover:bg-primary hover:text-white transition-colors">
+                    <button 
+                      onClick={() => alert(`Rappel activé pour: ${program.title}`)}
+                      className="mt-4 px-4 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-[11px] font-bold flex items-center gap-2 hover:bg-primary hover:text-white transition-colors"
+                    >
                       <Bell size={14} />
                       RAPPELER
                     </button>
