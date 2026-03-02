@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Hls from 'hls.js';
+import './firebase'; // Initialisation de Firebase
 import { Screen } from './types';
 import { STREAM_URL } from './constants';
 import SplashScreen from './components/SplashScreen';
