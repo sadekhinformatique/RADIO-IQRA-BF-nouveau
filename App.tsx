@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import Hls from 'hls.js';
 import { Screen } from './types';
 import { STREAM_URL } from './constants';
 import SplashScreen from './components/SplashScreen';
@@ -13,7 +14,12 @@ const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.SPLASH);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem('radio-iqra-volume');
+    return saved ? parseInt(saved, 10) : 66;
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hlsRef = useRef<Hls | null>(null);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -23,29 +29,56 @@ const App: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  // Handle Audio Playback
+  useEffect(() => {
+    localStorage.setItem('radio-iqra-volume', volume.toString());
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
+
+  // Handle Audio Playback with HLS support
   useEffect(() => {
     if (!audioRef.current) {
-      audioRef.current = new Audio(STREAM_URL);
+      audioRef.current = new Audio();
     }
 
     const audio = audioRef.current;
+    audio.volume = volume / 100;
 
     if (isPlaying) {
-      // For live streams, it's better to reload to ensure we are at the "live" point 
-      // instead of playing from a buffer if it was paused for a long time.
-      audio.load();
-      audio.play().catch(error => {
-        console.error("Audio playback failed:", error);
-        setIsPlaying(false);
-      });
+      if (Hls.isSupported()) {
+        if (!hlsRef.current) {
+          hlsRef.current = new Hls();
+          hlsRef.current.loadSource(STREAM_URL);
+          hlsRef.current.attachMedia(audio);
+        }
+        audio.play().catch(error => {
+          console.error("Audio playback failed:", error);
+          setIsPlaying(false);
+        });
+      } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native support (Safari)
+        audio.src = STREAM_URL;
+        audio.play().catch(error => {
+          console.error("Audio playback failed:", error);
+          setIsPlaying(false);
+        });
+      }
     } else {
       audio.pause();
+      // For live streams, it's often better to destroy HLS on pause to stop downloading chunks
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      audio.src = '';
     }
 
     return () => {
-      // Cleanup is handled by the ref persisting, but we pause on unmount
-      audio.pause();
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
     };
   }, [isPlaying]);
 
@@ -54,7 +87,7 @@ const App: React.FC = () => {
       case Screen.SPLASH:
         return <SplashScreen onComplete={() => setCurrentScreen(Screen.PLAYER)} />;
       case Screen.PLAYER:
-        return <PlayerScreen isPlaying={isPlaying} setIsPlaying={setIsPlaying} />;
+        return <PlayerScreen isPlaying={isPlaying} setIsPlaying={setIsPlaying} volume={volume} setVolume={setVolume} />;
       case Screen.SCHEDULE:
         return <ScheduleScreen />;
       case Screen.FAVORITES:
@@ -62,7 +95,7 @@ const App: React.FC = () => {
       case Screen.SETTINGS:
         return <SettingsScreen isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
       default:
-        return <PlayerScreen isPlaying={isPlaying} setIsPlaying={setIsPlaying} />;
+        return <PlayerScreen isPlaying={isPlaying} setIsPlaying={setIsPlaying} volume={volume} setVolume={setVolume} />;
     }
   };
 
